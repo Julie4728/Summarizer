@@ -33,7 +33,8 @@ const handleMouseUp = () => {
             font-family: Arial, sans-serif;
           `;
           
-          popup.textContent = response.summary;
+          const formattedText = response.summary.replace(/\n/g, '<br>');
+          popup.innerHTML = formattedText;
           
           // Add close button
           const closeButton = document.createElement('button');

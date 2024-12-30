@@ -2,9 +2,17 @@ const express = require('express');
 const cors = require('cors');
 const app = express();
 require('dotenv').config();
+const fs = require('fs');
+const path = require('path');
 
 app.use(cors());
 app.use(express.json());
+
+// Read the prompt template
+const promptTemplate = fs.readFileSync(
+    path.join(__dirname, 'prompts', 'summarizer_prompt.txt'),
+    'utf-8'
+);
 
 app.post('/analyze', async (req, res) => {
     try {
@@ -15,16 +23,18 @@ app.post('/analyze', async (req, res) => {
                 "Authorization": `Bearer ${process.env.OPENAI_API_KEY}`,
             },
             body: JSON.stringify({
-                model: "gpt-3.5-turbo",
+                model: "gpt-4",
                 messages: [{
                     role: "user",
-                    content: `Summarize this privacy policy text. make sure you response beneath 290 tokens, and explain as if you're talking to a 10 year old. and response in korean!!: "${req.body.text}". Also identify if it contains problematic clauses or is out of compliance with GDPR or other laws, and tell it in korean.`
+                    content: promptTemplate.replace('${text}', req.body.text)
                 }],
-                max_tokens: 300,
+                max_tokens: 2000,
             }),
+            
         });
 
         const result = await response.json();
+        
         
         if (result.error) {
             throw new Error(result.error.message);

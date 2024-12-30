@@ -25,7 +25,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         console.log("Selected Text:", message.text);
         summarizeAndAnalyze(message.text)
             .then(summary => {
-                sendResponse({ summary: summary });
+                sendResponse({ summary: `<span>${summary}</span>` });
             })
             .catch(error => {
                 sendResponse({ error: error.message });

@@ -8,7 +8,7 @@ const path = require('path');
 app.use(cors());
 app.use(express.json());
 
-// Read the prompt template
+
 const promptTemplate = fs.readFileSync(
     path.join(__dirname, 'prompts', 'summarizer_prompt.txt'),
     'utf-8'

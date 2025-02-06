@@ -1,3 +1,20 @@
+chrome.runtime.onConnect.addListener((port) => {
+    console.assert(port.name === "content-script");
+
+    port.onMessage.addListener((message) => {
+        if (message.action === "textSelected") {
+            console.log("Selected Text:", message.text);
+            summarizeAndAnalyze(message.text)
+                .then(summary => {
+                    port.postMessage({ summary: `<span>${summary}</span>` });
+                })
+                .catch(error => {
+                    port.postMessage({ error: error.message });
+                });
+        }
+    });
+});
+
 async function summarizeAndAnalyze(text) {
     try {
         const response = await fetch("https://summarizer-mvfb.onrender.com/analyze", {
@@ -19,20 +36,3 @@ async function summarizeAndAnalyze(text) {
         throw error;
     }
 }
-
-chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-    if (message.action === "textSelected") {
-        console.log("Selected Text:", message.text);
-        summarizeAndAnalyze(message.text)
-            .then(summary => {
-                sendResponse({ summary: `<span>${summary}</span>` });
-            })
-            .catch(error => {
-                sendResponse({ error: error.message });
-            });
-        return true;
-    }
-});
-
-  
-  

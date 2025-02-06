@@ -1,36 +1,13 @@
-const express = require('express');
-const cors = require('cors');
-global.fetch = require('node-fetch');
-const fs = require('fs');
-const path = require('path');
-require('dotenv').config();
-
-const app = express();
-app.use(cors({
-    origin: '*', // Allow requests from any origin (you can restrict this if needed)
-    methods: ['GET', 'POST'],
-    allowedHeaders: ['Content-Type', 'Authorization']
-}));
-
-app.use(express.json());
-
-// Check if the prompt file exists
-const promptPath = path.join(__dirname, 'prompts', 'summarizer_prompt.txt');
-if (!fs.existsSync(promptPath)) {
-    console.error("Error: prompt file not found at", promptPath);
-    process.exit(1);
-}
-
-const promptTemplate = fs.readFileSync(promptPath, 'utf-8');
-
 app.post('/analyze', async (req, res) => {
     try {
         console.log("Received request:", req.body);
-
+        
         const apiKey = process.env.OPENAI_API_KEY;
         if (!apiKey) {
             throw new Error("Missing OpenAI API Key. Set it in environment variables.");
         }
+
+        console.log("API Key is present, making request to OpenAI...");
 
         const response = await fetch("https://api.openai.com/v1/chat/completions", {
             method: "POST",
@@ -48,6 +25,13 @@ app.post('/analyze', async (req, res) => {
             }),
         });
 
+        console.log("Received response from OpenAI:", response.status);
+        
+        if (!response.ok) {
+            const errorText = await response.text();
+            throw new Error(`OpenAI error: ${errorText}`);
+        }
+
         const result = await response.json();
         console.log("OpenAI API Response:", result);
 
@@ -62,6 +46,3 @@ app.post('/analyze', async (req, res) => {
         res.status(500).json({ error: error.message });
     }
 });
-
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));

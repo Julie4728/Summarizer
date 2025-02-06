@@ -1,6 +1,6 @@
 async function summarizeAndAnalyze(text) {
     try {
-        const response = await fetch("http://localhost:3000/analyze", {
+        const response = await fetch("https://summarizer-mvfb.onrender.com/analyze", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",

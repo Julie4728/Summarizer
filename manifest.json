@@ -6,17 +6,18 @@
     "permissions": [
       "activeTab",
       "scripting",
-      "storage"
+      "storage",
+      "background"
     ],
     "host_permissions": [
-        "<all_urls>"
+        "https://summarizer-mvfb.onrender.com/*"
     ],
     "background": {
-      "service_worker": "Summarizer/background.js"
+      "service_worker": "./Summarizer/background.js"
     },
     "content_scripts": [
       {
-        "matches": ["<all_urls>"],
+        "matches": ["https://*/*"],
         "js": ["Summarizer/content.js"]
       }
     ],
